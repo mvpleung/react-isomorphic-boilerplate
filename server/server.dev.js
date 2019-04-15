@@ -62,10 +62,16 @@ app.use(views(path.resolve(__dirname, '../views/dev'), {map: {html: 'ejs'}}))
 app.use(clientRoute)
 app.use(router.routes())
 app.use(router.allowedMethods())
-console.log(`\n==> 🌎  Listening on port ${port}. Open up http://localhost:${port}/ in your browser.\n`)
-app.use(convert(devMiddleware(compiler, {
-    noInfo: true,
-    publicPath: config.output.publicPath
-})))
+console.log(
+    `\n==> 🌎  Listening on port ${port}. Open up http://localhost:${port}/ in your browser.\n`
+)
+app.use(
+    convert(
+        devMiddleware(compiler, {
+            noInfo: true,
+            publicPath: config.output.publicPath
+        })
+    )
+)
 app.use(convert(hotMiddleware(compiler)))
 app.listen(port)

@@ -8,7 +8,10 @@
         "clean": "rimraf ./dist/client/* && rimraf ./dist/server/* && rimraf ./views/prod/*",
         "lint": "eslint . --ext .js",
         "start": "node ./dist/server/server.js",
-        "pm2": "pm2"
+        "pm2": "pm2",
+        "pm2:start": "pm2 start ./dist/server/server.js -i 0 --name \"react-serve\"",
+        "pm2:restart": "pm2 restart \"react-serve\"",
+        "pm2:stop": "pm2 stop \"react-serve\""
     },
     "dependencies": {
         "ejs": "^2.5.5",

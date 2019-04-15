@@ -7,7 +7,8 @@ const path = require('path'),
 let clientConfig, serverConfig
 
 function getExternals() {
-    return fs.readdirSync(path.resolve(__dirname, '../node_modules'))
+    return fs
+        .readdirSync(path.resolve(__dirname, '../node_modules'))
         .filter(filename => !filename.includes('.bin'))
         .reduce((externals, filename) => {
             externals[filename] = `commonjs ${filename}`
@@ -20,13 +21,7 @@ clientConfig = {
     context: path.resolve(__dirname, '..'),
     entry: {
         bundle: './client',
-        vendor: [
-            'react',
-            'react-dom',
-            'redux',
-            'react-redux',
-            'superagent'
-        ]
+        vendor: ['react', 'react-dom', 'redux', 'react-redux', 'superagent']
     },
     output: {
         path: path.resolve(__dirname, '../dist/client'),
@@ -35,28 +30,37 @@ clientConfig = {
         publicPath: '/'
     },
     module: {
-        loaders: [{
-            test: /\.js$/,
-            exclude: /node_modules/,
-            loader: 'babel',
-            query: {
-                presets: ['es2015', 'react', 'stage-0'],
-                plugins: ['transform-runtime', 'add-module-exports'],
-                cacheDirectory: true
+        loaders: [
+            {
+                test: /\.js$/,
+                exclude: /node_modules/,
+                loader: 'babel',
+                query: {
+                    presets: ['es2015', 'react', 'stage-0'],
+                    plugins: ['transform-runtime', 'add-module-exports'],
+                    cacheDirectory: true
+                }
+            },
+            {
+                test: /\.scss$/,
+                loader: ExtractTextPlugin.extract(
+                    'style',
+                    'css?modules&camelCase&importLoaders=1&localIdentName=[hash:base64:8]!postcss!sass'
+                )
+            },
+            {
+                test: /\.(jpg|png|gif|webp)$/,
+                loader: 'url?limit=8000'
+            },
+            {
+                test: /\.json$/,
+                loader: 'json'
+            },
+            {
+                test: /\.html$/,
+                loader: 'html?minimize=false'
             }
-        }, {
-            test: /\.scss$/,
-            loader: ExtractTextPlugin.extract('style', 'css?modules&camelCase&importLoaders=1&localIdentName=[hash:base64:8]!postcss!sass')
-        }, {
-            test: /\.(jpg|png|gif|webp)$/,
-            loader: 'url?limit=8000'
-        }, {
-            test: /\.json$/,
-            loader: 'json'
-        }, {
-            test: /\.html$/,
-            loader: 'html?minimize=false'
-        }]
+        ]
     },
     postcss: [autoprefixer({browsers: ['> 5%']})],
     resolve: {extensions: ['', '.js', '.json', '.scss']},
@@ -73,7 +77,7 @@ clientConfig = {
         }),
         new webpack.DefinePlugin({'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV)}),
         new HtmlWebpackPlugin({
-            filename: '../../views/prod/index.html',
+            filename: '../../dist/server/index.html',
             template: './views/tpl/index.tpl.html',
             chunksSortMode: 'none'
         }),
@@ -95,28 +99,33 @@ serverConfig = {
         __dirname: true
     },
     module: {
-        loaders: [{
-            test: /\.js$/,
-            exclude: /node_modules/,
-            loader: 'babel',
-            query: {
-                presets: ['es2015', 'react', 'stage-0'],
-                plugins: ['add-module-exports'],
-                cacheDirectory: true
+        loaders: [
+            {
+                test: /\.js$/,
+                exclude: /node_modules/,
+                loader: 'babel',
+                query: {
+                    presets: ['es2015', 'react', 'stage-0'],
+                    plugins: ['add-module-exports'],
+                    cacheDirectory: true
+                }
+            },
+            {
+                test: /\.scss$/,
+                loaders: [
+                    'css/locals?modules&camelCase&importLoaders=1&localIdentName=[hash:base64:8]',
+                    'sass'
+                ]
+            },
+            {
+                test: /\.(jpg|png|gif|webp)$/,
+                loader: 'url?limit=8000'
+            },
+            {
+                test: /\.json$/,
+                loader: 'json'
             }
-        }, {
-            test: /\.scss$/,
-            loaders: [
-                'css/locals?modules&camelCase&importLoaders=1&localIdentName=[hash:base64:8]',
-                'sass'
-            ]
-        }, {
-            test: /\.(jpg|png|gif|webp)$/,
-            loader: 'url?limit=8000'
-        }, {
-            test: /\.json$/,
-            loader: 'json'
-        }]
+        ]
     },
     externals: getExternals(),
     resolve: {extensions: ['', '.js', '.json', '.scss']},
